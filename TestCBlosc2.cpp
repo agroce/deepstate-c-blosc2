@@ -11,8 +11,8 @@ using namespace deepstate;
 #include <math.h>
 #include "blosc2.h"
 
-#define NUM_RUNS 4
-#define NUM_INTERNAL 4
+#define MAX_RUNS 4
+#define MAX_INTERNAL 4
 
 inline static void* blosc_malloc(const size_t alignment, const size_t size) {
   const int32_t clean_value = 0x99;
@@ -40,12 +40,15 @@ TEST(CBlosc2, RoundTrip) {
   size_t alignments[] = {32, 64};
   /* snappy is not available */
   const char* compressors[] = {"blosclz", "lz4", "lz4hc", "zlib", "zstd"};
-  
-  for (int i = 0; i < NUM_RUNS; i++) {
-    LOG(TRACE) << "Starting run #" << i;
+
+  unsigned num_runs = DeepState_UIntInRange(1, MAX_RUNS);
+  LOG(TRACE) << "Performing " << num_runs << " round trips.";
+
+  for (int i = 0; i < num_runs; i++) {
+    LOG(TRACE) << "*******************************   Starting run #" << i << "   *******************************";
     size_t type_size = DeepState_UIntInRange(1, 512);
     LOG(TRACE) << "Type size = " << type_size;
-    size_t num_elements = DeepState_UIntInRange(1, 2048/type_size);
+    size_t num_elements = DeepState_UIntInRange(1, ((DEEPSTATE_SIZE-256)/type_size)/num_runs);
     LOG(TRACE) << "Number of elements = " << num_elements;
     size_t buffer_alignment = OneOf(alignments);
     LOG(TRACE) << "Buffer alignment = " << buffer_alignment;
@@ -94,8 +97,8 @@ TEST(CBlosc2, RoundTrip) {
     LOG(TRACE) << "type size = " << typesize;
     //ASSERT_EQ(typesize, type_size) << "type size = " << type_size << " but meta claims " << typesize;
     LOG(TRACE) << "DOSHUFFLE: " << (int)(flags & BLOSC_DOSHUFFLE);
-    //ASSERT(((flags & BLOSC_DOSHUFFLE) && do_shuffle) || (!(flags & BLOSC_DOSHUFFLE) && !do_shuffle)) <<
-    //"do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
+    ASSERT(((flags & BLOSC_DOSHUFFLE) && do_shuffle) || (!(flags & BLOSC_DOSHUFFLE) && !do_shuffle)) <<
+      "do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
     LOG(TRACE) << "DOBITSHUFFLE: " << (int)(flags & BLOSC_DOBITSHUFFLE);
     LOG(TRACE) << "DODELTA: " << (int)(flags & BLOSC_DODELTA);
     LOG(TRACE) << "MEMCPYED: " << (int)(flags & BLOSC_MEMCPYED);
@@ -113,10 +116,14 @@ TEST(CBlosc2, RoundTrip) {
       ASSERT(strcmp(b_compressor_lower, compressor) == 0) << "Compressor changed from " << compressor << " to " << b_compressor;
     }
 
-    for(int j = 0; j < NUM_INTERNAL; j++) {
+    unsigned num_internal_actions = DeepState_UIntInRange(0, MAX_INTERNAL);
+    LOG(TRACE) << "Performing " << num_internal_actions << " non-buffer-changing actions.";
+    
+    for(int j = 0; j < num_internal_actions; j++) {
       OneOf(
 	    [&] {
 	      const char* compressor = OneOf(compressors);
+	      LOG(TRACE) << "Setting compressor to" << compressor;
 	      ASSERT(blosc_set_compressor(compressor) != -1) << "Setting compressor to " << compressor << " failed!";
 	    },
 	    [&] {
@@ -129,6 +136,8 @@ TEST(CBlosc2, RoundTrip) {
 	      unsigned num_items = DeepState_UIntInRange(0, num_elements-start_item);
 	      LOG(TRACE) << "Getting " << num_items << " from " << start_item;
 	      int get_result = blosc_getitem(intermediate, start_item, num_items, items);
+	      ASSERT((get_result == num_items) || (get_result == (num_items * type_size))) <<
+		"Getting " << num_items << " from " << start_item << " with size " << type_size << ": got " << get_result;		
 	      //ASSERT_EQ(get_result, num_items * type_size) <<
 	      //"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
 	    },
