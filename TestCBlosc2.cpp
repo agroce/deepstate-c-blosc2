@@ -1,14 +1,6 @@
 #include <deepstate/DeepState.hpp>
 using namespace deepstate;
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <math.h>
 #include "blosc2.h"
 
 #define MAX_RUNS 4
@@ -46,7 +38,7 @@ TEST(CBlosc2, RoundTrip) {
 
   for (int i = 0; i < num_runs; i++) {
     LOG(TRACE) << "*******************************   Starting run #" << i << "   *******************************";
-    size_t type_size = DeepState_UIntInRange(1, 512);
+    size_t type_size = DeepState_UIntInRange(1, 255);
     LOG(TRACE) << "Type size = " << type_size;
     size_t num_elements = DeepState_UIntInRange(1, ((DEEPSTATE_SIZE-256)/type_size)/num_runs);
     LOG(TRACE) << "Number of elements = " << num_elements;
@@ -95,7 +87,7 @@ TEST(CBlosc2, RoundTrip) {
     int flags;
     blosc_cbuffer_metainfo(intermediate, &typesize, &flags);
     LOG(TRACE) << "type size = " << typesize;
-    //ASSERT_EQ(typesize, type_size) << "type size = " << type_size << " but meta claims " << typesize;
+    ASSERT_EQ(typesize, type_size) << "type size = " << type_size << " but meta claims " << typesize;
     LOG(TRACE) << "DOSHUFFLE: " << (int)(flags & BLOSC_DOSHUFFLE);
     //ASSERT(((flags & BLOSC_DOSHUFFLE) && do_shuffle) || (!(flags & BLOSC_DOSHUFFLE) && !do_shuffle)) <<
     //"do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
@@ -136,10 +128,8 @@ TEST(CBlosc2, RoundTrip) {
 	      unsigned num_items = DeepState_UIntInRange(0, num_elements-start_item);
 	      LOG(TRACE) << "Getting " << num_items << " from " << start_item;
 	      int get_result = blosc_getitem(intermediate, start_item, num_items, items);
-	      ASSERT((get_result == num_items) || (get_result == (num_items * type_size))) <<
-		"Getting " << num_items << " from " << start_item << " with size " << type_size << ": got " << get_result;		
-	      //ASSERT_EQ(get_result, num_items * type_size) <<
-	      //"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
+	      ASSERT_EQ(get_result, num_items * type_size) <<
+		"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
 	    },
 	    [&] {
 	      LOG(TRACE) << "Freeing resources";
