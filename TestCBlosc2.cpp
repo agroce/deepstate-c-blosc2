@@ -39,26 +39,22 @@ TEST(CBlosc2, RoundTrip) {
   for (int i = 0; i < num_runs; i++) {
     LOG(TRACE) << "*******************************   Starting run #" << i << "   *******************************";
     size_t type_size = DeepState_UIntInRange(1, 255);
-    LOG(TRACE) << "Type size = " << type_size;
     size_t num_elements = DeepState_UIntInRange(1, ((DEEPSTATE_SIZE-256)/type_size)/num_runs);
-    LOG(TRACE) << "Number of elements = " << num_elements;
     size_t buffer_alignment = OneOf(alignments);
-    LOG(TRACE) << "Buffer alignment = " << buffer_alignment;
     size_t compression_level = DeepState_IntInRange(0, 9);
-    LOG(TRACE) << "Compression level = " << compression_level;
     size_t do_shuffle = DeepState_Bool();
-    LOG(TRACE) << "Do shuffle = " << do_shuffle;
 
     const char* compressor = OneOf(compressors);
-    LOG(TRACE) << "Setting compressor to " << compressor;
     ASSERT(blosc_set_compressor(compressor) != -1) << "setting compressor to " << compressor << " failed!";
 
     int new_delta = DeepState_UIntInRange(0, 1);
-    LOG(TRACE) << "Setting delta to " << new_delta;
     blosc_set_delta(new_delta);    
 
     size_t buffer_size = type_size * num_elements;
-    LOG(TRACE) << "Buffer size = " << buffer_size;
+
+    LOG(TRACE) << "Compression task: type_size: " << type_size << " ; num_elements: " << num_elements << " ; buffer_alignment: " <<
+      buffer_alignment << "; compression_level: " << compression_level << "; do_shuffle: " << do_shuffle << "; compressor: " <<
+      compressor << "; delta: " << new_delta << "; buffer_size: " << buffer_size;
     
     /* Allocate memory for the test. */
     void* original = blosc_malloc(buffer_alignment, buffer_size);
@@ -86,17 +82,16 @@ TEST(CBlosc2, RoundTrip) {
     size_t typesize;
     int flags;
     blosc_cbuffer_metainfo(intermediate, &typesize, &flags);
-    LOG(TRACE) << "type size = " << typesize;
-    ASSERT_EQ(typesize, type_size) << "type size = " << type_size << " but meta claims " << typesize;
-    LOG(TRACE) << "DOSHUFFLE: " << (int)(flags & BLOSC_DOSHUFFLE);
-    //ASSERT(((flags & BLOSC_DOSHUFFLE) && do_shuffle) || (!(flags & BLOSC_DOSHUFFLE) && !do_shuffle)) <<
-    //"do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
-    LOG(TRACE) << "DOBITSHUFFLE: " << (int)(flags & BLOSC_DOBITSHUFFLE);
-    LOG(TRACE) << "DODELTA: " << (int)(flags & BLOSC_DODELTA);
-    LOG(TRACE) << "MEMCPYED: " << (int)(flags & BLOSC_MEMCPYED);
+    ASSERT_EQ(typesize, type_size) << "typesize:" << type_size << " but meta claims " << typesize;
+    LOG(TRACE) << "typesize: " << typesize << "; DOSHUFFLE: " << (int)(flags & BLOSC_DOSHUFFLE) <<
+      "; DOBITSHUFFLE: " << (int)(flags & BLOSC_DOBITSHUFFLE) << "; DODELTA: " << (int)(flags & BLOSC_DODELTA) <<
+      "; MEMCPYED: " << (int)(flags & BLOSC_MEMCPYED);
+    ASSERT(((flags & BLOSC_DOSHUFFLE) && do_shuffle) || (!(flags & BLOSC_DOSHUFFLE) && !do_shuffle) ||
+	   (!(flags & BLOSC_DOSHUFFLE) && do_shuffle && (type_size == 1))) <<
+      "do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
 
     const char* b_compressor = blosc_cbuffer_complib(intermediate);
-    LOG(TRACE) << "compressor = " << b_compressor;
+    LOG(TRACE) << "compressor: " << b_compressor;
     if ((strcmp(compressor, "lz4hc") == 0) && (strcmp(b_compressor, "LZ4") == 0)) {
       LOG(TRACE) << "expected change from lz4hc to LZ4";
     } else { 
@@ -130,6 +125,10 @@ TEST(CBlosc2, RoundTrip) {
 	      int get_result = blosc_getitem(intermediate, start_item, num_items, items);
 	      ASSERT_EQ(get_result, num_items * type_size) <<
 		"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
+	      for (int k = 0; k < num_items; k++) {
+		ASSERT(memcmp((char*)items + (k * type_size), (char*)original + ((k + start_item) * type_size), type_size) == 0) <<
+		  "Get returned wrong data for item " << k << " (getting " << num_items << " from " << start_item << ")";
+	      }
 	    },
 	    [&] {
 	      LOG(TRACE) << "Freeing resources";
