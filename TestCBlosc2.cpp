@@ -64,6 +64,10 @@ TEST(CBlosc2, RoundTrip) {
     
     /* Fill the input data buffer */
     DeepState_SymbolizeData(original, (char*)original + buffer_size);
+
+    for (int j = 0; j < buffer_size; j++) {
+      LOG(TRACE) << "original[" << j << "] = " << (int)(((char*)original)[j]);
+    }
     
     /* Compress the input data and store it in an intermediate buffer.
        Decompress the data from the intermediate buffer into a result buffer. */
@@ -126,6 +130,14 @@ TEST(CBlosc2, RoundTrip) {
 	      ASSERT_EQ(get_result, num_items * type_size) <<
 		"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
 	      for (int k = 0; k < num_items; k++) {
+		for (int l = 0; l < type_size; l++) {
+		  int original_value = *((char*)original + ((k + start_item) * type_size) + l);
+		  int item_value = *((char*)items + (k * type_size) + l);
+		  if (original_value != item_value) {
+		    LOG(TRACE) << "!!! MISMATCH !!!:";
+		  }
+		  LOG(TRACE) << "[" << k << "][" << l << "]: original: " << original_value << "; items: " <<item_value;
+		}
 		ASSERT(memcmp((char*)items + (k * type_size), (char*)original + ((k + start_item) * type_size), type_size) == 0) <<
 		  "Get returned wrong data for item " << k << " (getting " << num_items << " from " << start_item << ")";
 	      }
