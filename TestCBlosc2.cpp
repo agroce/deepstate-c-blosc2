@@ -98,10 +98,11 @@ TEST(CBlosc2, RoundTrip) {
     LOG(TRACE) << "compressor: " << b_compressor;
     if ((strcmp(compressor, "lz4hc") == 0) && (strcmp(b_compressor, "LZ4") == 0)) {
       LOG(TRACE) << "expected change from lz4hc to LZ4";
-    } else { 
-      char* b_compressor_lower = (char*)malloc(strlen(b_compressor) + 1);
-      for (int bci = 0; bci < strlen(b_compressor); bci++) {
-	b_compressor_lower[bci] = tolower(b_compressor[bci]);
+    } else {
+      unsigned b_len = strlen(b_compressor);
+      char* b_compressor_lower = (char*)malloc(b_len + 1);
+      for (int bci = 0; bci < b_len; bci++) {
+         b_compressor_lower[bci] = tolower(b_compressor[bci]);
       }
       b_compressor_lower[strlen(b_compressor)] = 0;
       ASSERT(strcmp(b_compressor_lower, compressor) == 0) << "Compressor changed from " << compressor << " to " << b_compressor;
@@ -110,7 +111,7 @@ TEST(CBlosc2, RoundTrip) {
     unsigned num_internal_actions = DeepState_UIntInRange(0, MAX_INTERNAL);
     LOG(TRACE) << "Performing " << num_internal_actions << " non-buffer-changing actions.";
     
-    for(int j = 0; j < num_internal_actions; j++) {
+    for (int j = 0; j < num_internal_actions; j++) {
       OneOf(
 	    [&] {
 	      const char* compressor = OneOf(compressors);
@@ -130,16 +131,16 @@ TEST(CBlosc2, RoundTrip) {
 	      ASSERT_EQ(get_result, num_items * type_size) <<
 		"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
 	      for (int k = 0; k < num_items; k++) {
-		for (int l = 0; l < type_size; l++) {
-		  int original_value = *((char*)original + ((k + start_item) * type_size) + l);
-		  int item_value = *((char*)items + (k * type_size) + l);
-		  if (original_value != item_value) {
-		    LOG(TRACE) << "!!! MISMATCH !!!:";
-		  }
-		  LOG(TRACE) << "[" << k << "][" << l << "]: original: " << original_value << "; items: " <<item_value;
-		}
-		ASSERT(memcmp((char*)items + (k * type_size), (char*)original + ((k + start_item) * type_size), type_size) == 0) <<
-		  "Get returned wrong data for item " << k << " (getting " << num_items << " from " << start_item << ")";
+		     for (int l = 0; l < type_size; l++) {
+		       int original_value = *((char*)original + ((k + start_item) * type_size) + l);
+		       int item_value = *((char*)items + (k * type_size) + l);
+		        if (original_value != item_value) {
+		          LOG(TRACE) << "!!! MISMATCH !!!:";
+		        }
+		     LOG(TRACE) << "[" << k << "][" << l << "]: original: " << original_value << "; items: " <<item_value;
+		     }
+		     ASSERT(memcmp((char*)items + (k * type_size), (char*)original + ((k + start_item) * type_size), type_size) == 0) <<
+		         "Get returned wrong data for item " << k << " (getting " << num_items << " from " << start_item << ")";
 	      }
 	    },
 	    [&] {
