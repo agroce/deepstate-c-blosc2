@@ -161,5 +161,8 @@ TEST(CBlosc2, RoundTrip) {
     free(intermediate);
     free(items);
     free(result);
+  
+    /* Cleanup blosc resources. */
+    blosc_destroy();
   }
 }
