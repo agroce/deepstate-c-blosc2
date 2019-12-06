@@ -102,9 +102,9 @@ TEST(CBlosc2, RoundTrip) {
       unsigned b_len = strlen(b_compressor);
       char* b_compressor_lower = (char*)malloc(b_len + 1);
       for (int bci = 0; bci < b_len; bci++) {
-	b_compressor_lower[bci] = tolower(b_compressor[bci]);
+        b_compressor_lower[bci] = tolower(b_compressor[bci]);
       }
-      b_compressor_lower[strlen(b_compressor)] = 0;
+      b_compressor_lower[b_len] = 0;
       ASSERT(strcmp(b_compressor_lower, compressor) == 0) << "Compressor changed from " << compressor << " to " << b_compressor;
     }
 
