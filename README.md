@@ -43,4 +43,9 @@ $ make
 $ ./testcblosc2 --fuzz --timeout 100
 ```
 
+The pre-computed tests can be run like this:
+```
+$ ./testcblosc2 --input_test_files_dir AFL_corpus
+```
+
 See https://github.com/trailofbits/deepstate for more on DeepState.
