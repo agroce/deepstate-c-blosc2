@@ -1,7 +1,7 @@
 CBLOSC2=/home/user/c-blosc2/install
 CBLOSC=/home/user/c-blosc/install
 
-FILES=testcblosc2 testcblosc2_san testcblosc2_swarm testcblosc2_AFL testcblosc2_swarm_AFL testcblosc2_LF testcblosc2_swarm_LF testcblosc testcblosc_san testcblosc_swarm testcblosc_AFL testcblosc_swarm_AFL testcblosc_LF testcblosc_swarm_LF testcblosc 
+FILES=testcblosc2 testcblosc2_san testcblosc2_swarm testcblosc2_AFL testcblosc2_swarm_AFL testcblosc2_LF testcblosc2_swarm_LF testcblosc testcblosc_swarm testcblosc_AFL testcblosc_swarm_AFL testcblosc_LF testcblosc_swarm_LF testcblosc 
 
 all: $(FILES)
 
@@ -32,8 +32,9 @@ testcblosc2_swarm_LF: TestCBlosc2.cpp
 testcblosc: TestCBlosc.cpp
 	$(CXX) -o testcblosc TestCBlosc.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc.a -ldeepstate -lpthread
 
-testcblosc_san: TestCBlosc.cpp
-	clang++ -o testcblosc_san TestCBlosc.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_san.a -ldeepstate -lpthread -fsanitize=address,undefined,integer
+# FAILS RIGHT NOW DUE TO TEST NOT WORKING WITH UBSAN
+#testcblosc_san: TestCBlosc.cpp
+#	clang++ -o testcblosc_san TestCBlosc.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_san.a -ldeepstate -lpthread -fsanitize=address,undefined,integer
 
 testcblosc_swarm: TestCBlosc.cpp
 	$(CXX) -o testcblosc_swarm TestCBlosc.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc.a -ldeepstate -lpthread -DDEEPSTATE_PURE_SWARM
