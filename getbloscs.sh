@@ -79,3 +79,5 @@ cd build
 CC=clang CXX=clang++ cmake -DCMAKE_INSTALL_PREFIX=/home/user/c-blosc/install ..
 cmake --build .
 cmake --build . --target install
+
+cd /home/user/deepstate-c-blosc2
