@@ -9,17 +9,17 @@ using namespace deepstate;
 inline static void* blosc_malloc(const size_t alignment, const size_t size) {
   const int32_t clean_value = 0x99;
   void* block = NULL;
-
+  
   block = aligned_alloc(alignment, size);
-
+  
   if (block == NULL) {
     fprintf(stderr, "Error allocating memory!");
     return NULL;
   }
-
+  
   /* Clean the allocated memory before returning. */
   memset(block, clean_value, size);
-
+  
   return block;
 }
 
@@ -32,10 +32,10 @@ TEST(CBlosc2, RoundTrip) {
   size_t alignments[] = {32, 64};
   /* snappy is not available */
   const char* compressors[] = {"blosclz", "lz4", "lz4hc", "zlib", "zstd"};
-
+  
   unsigned num_runs = DeepState_UIntInRange(1, MAX_RUNS);
   LOG(TRACE) << "Performing " << num_runs << " round trips.";
-
+  
   for (int i = 0; i < num_runs; i++) {
     LOG(TRACE) << "*******************************   Starting run #" << i << "   *******************************";
     size_t type_size = DeepState_UIntInRange(1, 255);
@@ -73,7 +73,7 @@ TEST(CBlosc2, RoundTrip) {
        Decompress the data from the intermediate buffer into a result buffer. */
     blosc_compress(compression_level, do_shuffle, type_size, buffer_size,
 		   original, intermediate, buffer_size + BLOSC_MAX_OVERHEAD);
-
+    
     size_t n_uncompressed;
     size_t n_compressed;
     size_t n_blocksize;
@@ -102,7 +102,7 @@ TEST(CBlosc2, RoundTrip) {
       unsigned b_len = strlen(b_compressor);
       char* b_compressor_lower = (char*)malloc(b_len + 1);
       for (int bci = 0; bci < b_len; bci++) {
-         b_compressor_lower[bci] = tolower(b_compressor[bci]);
+	b_compressor_lower[bci] = tolower(b_compressor[bci]);
       }
       b_compressor_lower[strlen(b_compressor)] = 0;
       ASSERT(strcmp(b_compressor_lower, compressor) == 0) << "Compressor changed from " << compressor << " to " << b_compressor;
@@ -110,7 +110,7 @@ TEST(CBlosc2, RoundTrip) {
 
     unsigned num_internal_actions = DeepState_UIntInRange(0, MAX_INTERNAL);
     LOG(TRACE) << "Performing " << num_internal_actions << " non-buffer-changing actions.";
-    
+
     for (int j = 0; j < num_internal_actions; j++) {
       OneOf(
 	    [&] {
@@ -131,16 +131,16 @@ TEST(CBlosc2, RoundTrip) {
 	      ASSERT_EQ(get_result, num_items * type_size) <<
 		"Getting " << num_items << " from " << start_item << " expected: " << num_items * type_size << ": got " << get_result;
 	      for (int k = 0; k < num_items; k++) {
-		     for (int l = 0; l < type_size; l++) {
-		       int original_value = *((char*)original + ((k + start_item) * type_size) + l);
-		       int item_value = *((char*)items + (k * type_size) + l);
-		        if (original_value != item_value) {
-		          LOG(TRACE) << "!!! MISMATCH !!!:";
-		        }
-		     LOG(TRACE) << "[" << k << "][" << l << "]: original: " << original_value << "; items: " <<item_value;
-		     }
-		     ASSERT(memcmp((char*)items + (k * type_size), (char*)original + ((k + start_item) * type_size), type_size) == 0) <<
-		         "Get returned wrong data for item " << k << " (getting " << num_items << " from " << start_item << ")";
+		for (int l = 0; l < type_size; l++) {
+		  int original_value = *((char*)original + ((k + start_item) * type_size) + l);
+		  int item_value = *((char*)items + (k * type_size) + l);
+		  if (original_value != item_value) {
+		    LOG(TRACE) << "!!! MISMATCH !!!:";
+		  }
+		  LOG(TRACE) << "[" << k << "][" << l << "]: original: " << original_value << "; items: " <<item_value;
+		}
+		ASSERT(memcmp((char*)items + (k * type_size), (char*)original + ((k + start_item) * type_size), type_size) == 0) <<
+		  "Get returned wrong data for item " << k << " (getting " << num_items << " from " << start_item << ")";
 	      }
 	    },
 	    [&] {
