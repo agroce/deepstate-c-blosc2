@@ -61,15 +61,17 @@ cmake --build .
 cmake --build . --target install
 mv /home/user/c-blosc/install/lib/libblosc.a /home/user/c-blosc/install/lib/libblosc_LF.a 
 
-cd ..
-rm -rf build
+#Sanitizer builds for original don't work right now
 
-mkdir build
-cd build
-CC=clang CXX=clang++ CFLAGS=-fsanitize=address,undefined,integer CXXFLAGS=-fsanitize=address,undefined,integer cmake -DCMAKE_INSTALL_PREFIX=/home/user/c-blosc/install ..
-cmake --build .
-cmake --build . --target install
-mv /home/user/c-blosc/install/lib/libblosc.a /home/user/c-blosc/install/lib/libblosc_san.a 
+#cd ..
+#rm -rf build
+
+#mkdir build
+#cd build
+#CC=clang CXX=clang++ CFLAGS=-fsanitize=address,undefined,integer CXXFLAGS=-fsanitize=address,undefined,integer cmake -DCMAKE_INSTALL_PREFIX=/home/user/c-blosc/install ..
+#cmake --build .
+#cmake --build . --target install
+#mv /home/user/c-blosc/install/lib/libblosc.a /home/user/c-blosc/install/lib/libblosc_san.a
 
 cd ..
 rm -rf build
