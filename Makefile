@@ -50,3 +50,9 @@ testcblosc_LF: TestCBloscs.cpp
 
 testcblosc_swarm_LF: TestCBloscs.cpp
 	clang++ -o testcblosc_swarm_LF TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_LF.a -ldeepstate_LF -lpthread -fsanitize=fuzzer -DDEEPSTATE_PURE_SWARM -DTEST_ORIGINAL_CBLOSC
+
+tests: $(FILES)
+	./testcblosc2 --input_test_files_dir reduced_LF_novalue_corpus_testcblosc2 --no_fork
+	./testcblosc2 --input_test_files_dir reduced_LF_value_corpus_testcblosc2 --no_fork
+	./testcblosc --input_test_files_dir reduced_LF_novalue_corpus_testcblosc --no_fork
+	./testcblosc --input_test_files_dir reduced_LF_value_corpus_testcblosc --no_fork
