@@ -21,8 +21,9 @@ the DeepState docker environment, do all these things for you.  This
 will take a while, due to compilation of some compressors being very
 slow with sanitizers.
 
-Tests are binary compatible between the c-blosc versions, which means
-original c-blosc tests read some pointless bytes.
+Tests are binary compatible (in fact use the same harness, with
+very small code changes) between the c-blosc versions, which means
+original c-blosc tests read some pointless bytes to set delta.
 
 You can get started fuzzing with just a few commands:
 
@@ -45,7 +46,7 @@ $ ./testcblosc2 --fuzz --timeout 100
 
 The pre-computed tests can be run like this:
 ```
-$ ./testcblosc2 --input_test_files_dir AFL_corpus
+$ ./testcblosc2 --input_test_files_dir reduced_LF_novalue_corpus_testcblosc2 --no_fork
 ```
 
 See https://github.com/trailofbits/deepstate for more on DeepState.
