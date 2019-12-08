@@ -31,7 +31,7 @@ TEST(CBlosc2, RoundTrip) {
 
   size_t alignments[] = {32, 64};
   /* snappy is not available */
-  const char* compressors[] = {"blosclz", "lz4", "lz4hc", "zlib", "zstd"};
+  const char *compressors[] = {"blosclz", "lz4", "lz4hc", "zlib", "zstd"};
   
   unsigned num_runs = DeepState_UIntInRange(1, MAX_RUNS);
   LOG(TRACE) << "Performing " << num_runs << " round trips.";
@@ -41,10 +41,10 @@ TEST(CBlosc2, RoundTrip) {
     size_t type_size = DeepState_UIntInRange(1, 255);
     size_t num_elements = DeepState_UIntInRange(1, ((DEEPSTATE_SIZE-256)/type_size)/num_runs);
     size_t buffer_alignment = OneOf(alignments);
-    size_t compression_level = DeepState_IntInRange(0, 9);
-    size_t do_shuffle = DeepState_Bool();
+    int compression_level = DeepState_IntInRange(0, 9);
+    int do_shuffle = DeepState_Bool();
 
-    const char* compressor = OneOf(compressors);
+    const char *compressor = OneOf(compressors);
     ASSERT(blosc_set_compressor(compressor) != -1) << "setting compressor to " << compressor << " failed!";
 
     int new_delta = DeepState_UIntInRange(0, 1);
@@ -94,13 +94,13 @@ TEST(CBlosc2, RoundTrip) {
 	   (!(flags & BLOSC_DOSHUFFLE) && do_shuffle && (type_size == 1))) <<
       "do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
 
-    const char* b_compressor = blosc_cbuffer_complib(intermediate);
+    const char *b_compressor = blosc_cbuffer_complib(intermediate);
     LOG(TRACE) << "compressor: " << b_compressor;
     if ((strcmp(compressor, "lz4hc") == 0) && (strcmp(b_compressor, "LZ4") == 0)) {
       LOG(TRACE) << "expected change from lz4hc to LZ4";
     } else {
       unsigned b_len = strlen(b_compressor);
-      char* b_compressor_lower = (char*)malloc(b_len + 1);
+      char *b_compressor_lower = (char*)malloc(b_len + 1);
       for (int bci = 0; bci < b_len; bci++) {
         b_compressor_lower[bci] = tolower(b_compressor[bci]);
       }
@@ -114,7 +114,7 @@ TEST(CBlosc2, RoundTrip) {
     for (int j = 0; j < num_internal_actions; j++) {
       OneOf(
 	    [&] {
-	      const char* compressor = OneOf(compressors);
+	      const char *compressor = OneOf(compressors);
 	      LOG(TRACE) << "Setting compressor to" << compressor;
 	      ASSERT(blosc_set_compressor(compressor) != -1) << "Setting compressor to " << compressor << " failed!";
 	    },
