@@ -30,23 +30,23 @@ testcblosc2_swarm_LF: TestCBloscs.cpp
 	clang++ -o testcblosc2_swarm_LF TestCBloscs.cpp -I$(CBLOSC2)/include $(CBLOSC2)/lib/libblosc2_LF.a -ldeepstate_LF -lpthread -fsanitize=fuzzer -DDEEPSTATE_PURE_SWARM
 
 testcblosc: TestCBloscs.cpp
-	$(CXX) -o testcblosc TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc.a -ldeepstate -lpthread -DTEST_CBLOSC
+	$(CXX) -o testcblosc TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc.a -ldeepstate -lpthread -DTEST_ORIGINAL_CBLOSC
 
 # FAILS RIGHT NOW DUE TO TEST NOT WORKING WITH UBSAN
 #testcblosc_san: TestCBloscs.cpp
 #	clang++ -o testcblosc_san TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_san.a -ldeepstate -lpthread -fsanitize=address,undefined,integer
 
 testcblosc_swarm: TestCBloscs.cpp
-	$(CXX) -o testcblosc_swarm TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc.a -ldeepstate -lpthread -DDEEPSTATE_PURE_SWARM -DTEST_CBLOSC
+	$(CXX) -o testcblosc_swarm TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc.a -ldeepstate -lpthread -DDEEPSTATE_PURE_SWARM -DTEST_ORIGINAL_CBLOSC
 
 testcblosc_AFL: TestCBloscs.cpp
-	afl-clang++ -o testcblosc_AFL TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_AFL.a -ldeepstate_AFL -lpthread -DTEST_CBLOSC
+	afl-clang++ -o testcblosc_AFL TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_AFL.a -ldeepstate_AFL -lpthread -DTEST_ORIGINAL_CBLOSC
 
 testcblosc_swarm_AFL: TestCBloscs.cpp
-	afl-clang++ -o testcblosc_swarm_AFL TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_AFL.a -ldeepstate_AFL -lpthread -DDEEPSTATE_PURE_SWARM -DTEST_CBLOSC
+	afl-clang++ -o testcblosc_swarm_AFL TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_AFL.a -ldeepstate_AFL -lpthread -DDEEPSTATE_PURE_SWARM -DTEST_ORIGINAL_CBLOSC
 
 testcblosc_LF: TestCBloscs.cpp
-	clang++ -o testcblosc_LF TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_LF.a -ldeepstate_LF -lpthread -fsanitize=fuzzer -DTEST_CBLOSC
+	clang++ -o testcblosc_LF TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_LF.a -ldeepstate_LF -lpthread -fsanitize=fuzzer -DTEST_ORIGINAL_CBLOSC
 
 testcblosc_swarm_LF: TestCBloscs.cpp
-	clang++ -o testcblosc_swarm_LF TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_LF.a -ldeepstate_LF -lpthread -fsanitize=fuzzer -DDEEPSTATE_PURE_SWARM -DTEST_CBLOSC
+	clang++ -o testcblosc_swarm_LF TestCBloscs.cpp -I$(CBLOSC)/include $(CBLOSC)/lib/libblosc_LF.a -ldeepstate_LF -lpthread -fsanitize=fuzzer -DDEEPSTATE_PURE_SWARM -DTEST_ORIGINAL_CBLOSC

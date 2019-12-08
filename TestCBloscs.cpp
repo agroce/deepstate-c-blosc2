@@ -1,7 +1,7 @@
 #include <deepstate/DeepState.hpp>
 using namespace deepstate;
 
-#ifndef TEST_BLOSC
+#ifndef TEST_ORIGINAL_CBLOSC
 #include "blosc2.h"
 #else
 #include "blosc.h"
@@ -52,7 +52,7 @@ TEST(CBloscs, RoundTrip) {
     ASSERT(blosc_set_compressor(compressor) != -1) << "setting compressor to " << compressor << " failed!";
 
     int new_delta = DeepState_UIntInRange(0, 1);
-#ifndef TEST_BLOSC
+#ifndef TEST_ORIGINAL_CBLOSC
     blosc_set_delta(new_delta);
 #endif
 
@@ -61,7 +61,7 @@ TEST(CBloscs, RoundTrip) {
     LOG(TRACE) << "Compression task: type_size: " << type_size << " ; num_elements: " << num_elements << " ; buffer_alignment: " <<
       buffer_alignment << "; compression_level: " << compression_level << "; do_shuffle: " << do_shuffle << "; compressor: " <<
       compressor <<
-#ifndef TEST_BLOSC
+#ifndef TEST_ORIGINAL_CBLOSC
       "; delta: " << new_delta <<
 #endif
       "; buffer_size: " << buffer_size;
@@ -99,7 +99,7 @@ TEST(CBloscs, RoundTrip) {
     ASSERT_EQ(typesize, type_size) << "typesize:" << type_size << " but meta claims " << typesize;
     LOG(TRACE) << "typesize: " << typesize << "; DOSHUFFLE: " << (int)(flags & BLOSC_DOSHUFFLE) <<
       "; DOBITSHUFFLE: " << (int)(flags & BLOSC_DOBITSHUFFLE) <<
-#ifndef TEST_BLOSC
+#ifndef TEST_ORIGINAL_CBLOSC
       "; DODELTA: " << (int)(flags & BLOSC_DODELTA) <<
 #endif
       "; MEMCPYED: " << (int)(flags & BLOSC_MEMCPYED);
@@ -133,7 +133,7 @@ TEST(CBloscs, RoundTrip) {
 	    },
 	    [&] {
 	      int new_delta = DeepState_UIntInRange(0, 1);
-#ifndef TEST_BLOSC
+#ifndef TEST_ORIGINAL_CBLOSC
 	      LOG(TRACE) << "Setting delta to " << new_delta;
 	      blosc_set_delta(new_delta);
 #endif
