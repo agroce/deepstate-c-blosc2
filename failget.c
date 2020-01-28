@@ -69,7 +69,7 @@ int main() {
   assert(memcmp(original, result, buffer_size) == 0);
 
   /* Now that we see the round-trip passed, check the items */
-  assert(memcmp(intermediate, items, get_result) == 0);
+  assert(memcmp(original, items, get_result) == 0);
   
   /* Free allocated memory. */
   free(original);
