@@ -103,12 +103,15 @@ TEST(CBloscs, RoundTrip) {
       "; DODELTA: " << (int)(flags & BLOSC_DODELTA) <<
 #endif
       "; MEMCPYED: " << (int)(flags & BLOSC_MEMCPYED);
+#ifdef TEST_ORIGINAL_CBLOSC
     ASSERT(((flags & BLOSC_DOSHUFFLE) && do_shuffle) || (!(flags & BLOSC_DOSHUFFLE) && !do_shuffle) ||
 	   (!(flags & BLOSC_DOSHUFFLE) && do_shuffle && (type_size == 1))) <<
       "do shuffle = " << (int)(flags & BLOSC_DOSHUFFLE) << " but set to " << do_shuffle;
+#endif
 
     const char *b_compressor = blosc_cbuffer_complib(intermediate);
     LOG(TRACE) << "compressor: " << b_compressor;
+#ifdef TEST_ORIGINAL_CBLOSC
     if ((strcmp(compressor, "lz4hc") == 0) && (strcmp(b_compressor, "LZ4") == 0)) {
       LOG(TRACE) << "expected change from lz4hc to LZ4";
     } else {
@@ -120,6 +123,7 @@ TEST(CBloscs, RoundTrip) {
       b_compressor_lower[b_len] = 0;
       ASSERT(strcmp(b_compressor_lower, compressor) == 0) << "Compressor changed from " << compressor << " to " << b_compressor;
     }
+#endif
 
     unsigned num_internal_actions = DeepState_UIntInRange(0, MAX_INTERNAL);
     LOG(TRACE) << "Performing " << num_internal_actions << " non-buffer-changing actions.";
@@ -128,7 +132,7 @@ TEST(CBloscs, RoundTrip) {
       OneOf(
 	    [&] {
 	      const char *compressor = OneOf(compressors);
-	      LOG(TRACE) << "Setting compressor to" << compressor;
+	      LOG(TRACE) << "Setting compressor to " << compressor;
 	      ASSERT(blosc_set_compressor(compressor) != -1) << "Setting compressor to " << compressor << " failed!";
 	    },
 	    [&] {
